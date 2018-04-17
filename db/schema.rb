@@ -10,10 +10,63 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20180417133841) do
+ActiveRecord::Schema.define(version: 20180417141222) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
+
+  create_table "booking_per_days", force: :cascade do |t|
+    t.bigint "day_id"
+    t.bigint "booking_id"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["booking_id"], name: "index_booking_per_days_on_booking_id"
+    t.index ["day_id"], name: "index_booking_per_days_on_day_id"
+  end
+
+  create_table "bookings", force: :cascade do |t|
+    t.string "type"
+    t.string "name"
+    t.string "description"
+    t.integer "price"
+    t.string "status"
+    t.string "location"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+  end
+
+  create_table "days", force: :cascade do |t|
+    t.bigint "roadtrip_id"
+    t.string "day_name"
+    t.integer "day_number"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["roadtrip_id"], name: "index_days_on_roadtrip_id"
+  end
+
+  create_table "roadtrips", force: :cascade do |t|
+    t.bigint "user_id"
+    t.string "password"
+    t.date "first_day"
+    t.date "last_day"
+    t.integer "duration"
+    t.string "starting_location"
+    t.string "ending_location"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["user_id"], name: "index_roadtrips_on_user_id"
+  end
+
+  create_table "tasks", force: :cascade do |t|
+    t.string "description"
+    t.string "status"
+    t.bigint "user_id"
+    t.bigint "roadtrip_id"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["roadtrip_id"], name: "index_tasks_on_roadtrip_id"
+    t.index ["user_id"], name: "index_tasks_on_user_id"
+  end
 
   create_table "users", force: :cascade do |t|
     t.string "email", default: "", null: false
@@ -32,4 +85,10 @@ ActiveRecord::Schema.define(version: 20180417133841) do
     t.index ["reset_password_token"], name: "index_users_on_reset_password_token", unique: true
   end
 
+  add_foreign_key "booking_per_days", "bookings"
+  add_foreign_key "booking_per_days", "days"
+  add_foreign_key "days", "roadtrips"
+  add_foreign_key "roadtrips", "users"
+  add_foreign_key "tasks", "roadtrips"
+  add_foreign_key "tasks", "users"
 end
